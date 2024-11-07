@@ -4,29 +4,26 @@ import java.lang.Math;
 public class factorization {
     private DLL list = new DLL();
     private int factures = 1;
-    int counter = 0;
+    private int gole = 0;
 
     public void findFactor(int n){
-        int x = 2, y = 2;
-        int c = (new Random()).nextInt();
-        c = c == 0? c++: c;
-        int output;
-        boolean flag = false;
-        while (counter < 10) {
-            if(flag){
-                c = (new Random()).nextInt();
-                c = c == 0? c++: c;
-                flag = false;
+        if(!isPrime(n)){
+            int x = 2, y = 2;
+            int c = Math.abs((new Random()).nextInt(n)+1);
+            int output;
+            gole = n;
+            int count = 0;
+            while (count++ < 100) {
+                c = Math.abs((new Random()).nextInt(gole)+1);
+                output = recursive_findFactor(x,y,n,c);
+                if(output > 1){
+                    list.insert(output);
+                    n = (int) Math.floor(((double) n)/((double) output));
+                }
+                if(factures == gole){
+                    break;
+                }
             }
-            output = recursive_findFactor(x,y,n,c);
-            if(output <= 0){
-                flag = true;
-            }
-            if(output == 1){
-                break;
-            }
-        }
-        if(!list.empty()){
             printFact();
         }
         else{
@@ -35,35 +32,43 @@ public class factorization {
     }
 
     private int recursive_findFactor(int x, int y, int n, int c){
-        try{
-            x = randomFunction(x, c, n);
-            y = randomFunction(randomFunction(y, c, n), c, n);
-            if(x == y){
-                counter++;
-                return -1;
-            }
-            int d = gcd(Math.abs(x-y), n);
-            if(d > 1 && d < n){
-                list.insert(d);
-                factures = factures*d;
-                if(factures == n){
-                    return 1;
-                }
-                if(factures > n || Math.floor(((double) n)/((double) factures)) != (((double) n)/((double) factures))){
-                    counter++;
-                    list.delete();
-                    factures = factures/d;
-                    return -1;
-                }
-                if(factures < n){
-                    counter--;
-                    return 0;
-                }
-            }
-            return recursive_findFactor(x,y,n,c);
-        }catch (Exception e){
-            return -2;
+        if(n%2 == 0){
+            factures *= 2;
+            return 2;
         }
+        if(n%3 == 0){
+            factures *= 3;
+            return 3;
+        }
+        if(isPrime(n)){
+            factures *= n;
+            return n;
+        }
+
+
+        x = randomFunction(x, c, n);
+        y = randomFunction(randomFunction(y, c, n), c, n);
+        if(x == y){
+            return -1;
+        }
+        int d = gcd(Math.abs(x-y), n);
+        if(1 < d && d < n){
+            factures *= d;
+            if(isPrime(d) && Math.floor(((double) gole)/((double) factures)) == (((double) gole)/((double) factures))){
+                return d;
+            }
+            factures /= d;
+            return 1; 
+        }
+        return recursive_findFactor(x, y, n, c);
+    }
+
+    public boolean isPrime(int n){
+        for(int i = 2; i < (int) Math.sqrt(n)+1; i++){
+            if(n%i == 0)
+                return false;
+        }
+        return true;
     }
 
     public int gcd(int a, int b){
